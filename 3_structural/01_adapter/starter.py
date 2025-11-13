@@ -146,8 +146,15 @@ class PaymentProcessor(ABC):
 #       zwróć {"status": "failed", "transaction_id": None}
 
 
-class PayPalAdapter:
-    pass
+class PayPalAdapter(PaymentProcessor):
+    def __init__(self, paypal_service: PayPalService):
+        self.paypal_service = paypal_service
+    def process_payment(self, amount: float, currency: str) -> dict:
+        amount_cents=int(amount * 100)
+        r = self.paypal_service.make_payment(amount_cents, currency)
+        if r['status_code'] == 200:
+            return {"status": "success", "transaction_id": r['payment_id']}
+        return {"status": "failed", "transaction_id": None}
 
 
 # %% STEP 4: Stripe Adapter - DO IMPLEMENTACJI
@@ -171,8 +178,14 @@ class PayPalAdapter:
 #       zwróć {"status": "failed", "transaction_id": None}
 
 
-class StripeAdapter:
-    pass
+class StripeAdapter(PaymentProcessor):
+    def __init__(self, stripe_service: StripeService):
+        self.stripe_service = stripe_service
+    def process_payment(self, amount: float, currency: str) -> dict:
+        r = self.stripe_service.charge(amount, currency)
+        if r['paid'] == True:
+            return {"status": "success", "transaction_id": r['id']}
+        return {"status": "failed", "transaction_id": None}
 
 
 # %% STEP 5: Przelewy24 Adapter - DO IMPLEMENTACJI
@@ -196,19 +209,25 @@ class StripeAdapter:
 #       zwróć {"status": "failed", "transaction_id": None}
 
 
-class Przelewy24Adapter:
-    pass
+class Przelewy24Adapter(PaymentProcessor):
+    def __init__(self, p24_service: Przelewy24Service):
+        self.p24_service = p24_service
+    def process_payment(self, amount: float, currency: str) -> dict:
+        r = self.p24_service.create_transaction(amount, currency)
+        if r['success'] == True:
+            return {"status": "success", "transaction_id": str(r['transactionId'])}
+        return {"status": "failed", "transaction_id": None}
 
 
 # %% Example Usage
 # Odkomentuj gdy zaimplementujesz
-# if __name__ == "__main__":
-#     # Klient używa tylko interfejsu PaymentProcessor
-#     paypal = PayPalAdapter(PayPalService())
-#     stripe = StripeAdapter(StripeService())
-#     p24 = Przelewy24Adapter(Przelewy24Service())
-#
-#     # Ten sam interfejs dla wszystkich!
-#     print(paypal.process_payment(100.50, "USD"))
-#     print(stripe.process_payment(50.00, "EUR"))
-#     print(p24.process_payment(200.00, "PLN"))
+if __name__ == "__main__":
+    # Klient używa tylko interfejsu PaymentProcessor
+    paypal = PayPalAdapter(PayPalService())
+    stripe = StripeAdapter(StripeService())
+    p24 = Przelewy24Adapter(Przelewy24Service())
+
+    # Ten sam interfejs dla wszystkich!
+    print(paypal.process_payment(100.50, "USD"))
+    print(stripe.process_payment(50.00, "EUR"))
+    print(p24.process_payment(200.00, "PLN"))
