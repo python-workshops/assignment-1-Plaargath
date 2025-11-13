@@ -126,44 +126,64 @@ class EquipmentFactory(ABC):
 
 # %% TODO: Implement Concrete Products - Weapons
 
-class Sword:
-    pass
+class Sword(Weapon):
+    def damage(self):
+        return 80
+    def get_name(self) -> str:
+        return self.__class__.__name__
 
+class Staff(Weapon):
+    def damage(self):
+        return 40
+    def get_name(self) -> str:
+        return self.__class__.__name__
 
-class Staff:
-    pass
-
-
-class Bow:
-    pass
+class Bow(Weapon):
+    def damage(self):
+        return 60
+    def get_name(self) -> str:
+        return self.__class__.__name__
 
 
 # %% TODO: Implement Concrete Products - Armor
 
-class HeavyArmor:
-    pass
+class HeavyArmor(Armor):
+    def defense(self):
+        return 50
+    def get_name(self) -> str:
+        return self.__class__.__name__
 
+class LightRobe(Armor):
+    def defense(self):
+        return 15
+    def get_name(self) -> str:
+        return self.__class__.__name__
 
-class LightRobe:
-    pass
-
-
-class LeatherArmor:
-    pass
-
+class LeatherArmor(Armor):
+    def defense(self):
+        return 25
+    def get_name(self) -> str:
+        return self.__class__.__name__
 
 # %% TODO: Implement Concrete Factories
 
-class WarriorEquipmentFactory:
-    pass
+class WarriorEquipmentFactory(EquipmentFactory):
+    def create_weapon(self) -> Weapon:
+        return Sword()
+    def create_armor(self) -> Armor:
+        return HeavyArmor()
 
+class MageEquipmentFactory(EquipmentFactory):
+    def create_weapon(self) -> Weapon:
+        return Staff()
+    def create_armor(self) -> Armor:
+        return LightRobe()
 
-class MageEquipmentFactory:
-    pass
-
-
-class ArcherEquipmentFactory:
-    pass
+class ArcherEquipmentFactory(EquipmentFactory):
+    def create_weapon(self) -> Weapon:
+        return Bow()
+    def create_armor(self) -> Armor:
+        return LeatherArmor()
 
 
 # %% TODO: Implement Factory Method
@@ -181,24 +201,29 @@ def get_equipment_factory(character_class: str) -> EquipmentFactory:
     Raises:
         ValueError: Gdy character_class jest nieznany
     """
-    pass
+    charclass_to_factory = {"warrior": WarriorEquipmentFactory,
+                            "mage": MageEquipmentFactory,
+                            "archer": ArcherEquipmentFactory}
+    if character_class.lower() not in charclass_to_factory:
+        raise ValueError(f"Unknown character class: {character_class}")
+    return charclass_to_factory[character_class.lower()]()
 
 # %% Example Usage
 # Odkomentuj gdy zaimplementujesz
-# if __name__ == "__main__":
-#     # Test different equipment sets
-#     classes = ["warrior", "mage", "archer"]
-#
-#     for char_class in classes:
-#         print(f"\n=== {char_class.upper()} EQUIPMENT ===")
-#         factory = get_equipment_factory(char_class)
-#
-#         weapon = factory.create_weapon()
-#         armor = factory.create_armor()
-#
-#         print(f"Weapon: {weapon.get_name()} (DMG: {weapon.damage()})")
-#         print(f"Armor: {armor.get_name()} (DEF: {armor.defense()})")
-#
-#         # Test equipment synergy
-#         total_power = weapon.damage() + armor.defense()
-#         print(f"Total Power: {total_power}")
+if __name__ == "__main__":
+    # Test different equipment sets
+    classes = ["warrior", "mage", "archer"]
+
+    for char_class in classes:
+        print(f"\n=== {char_class.upper()} EQUIPMENT ===")
+        factory = get_equipment_factory(char_class)
+
+        weapon = factory.create_weapon()
+        armor = factory.create_armor()
+
+        print(f"Weapon: {weapon.get_name()} (DMG: {weapon.damage()})")
+        print(f"Armor: {armor.get_name()} (DEF: {armor.defense()})")
+
+        # Test equipment synergy
+        total_power = weapon.damage() + armor.defense()
+        print(f"Total Power: {total_power}")
