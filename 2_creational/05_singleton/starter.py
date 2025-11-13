@@ -81,6 +81,11 @@ class ConfigManager:
     #   - Sprawdź czy instancja już istnieje
     #   - Jeśli nie: stwórz i zapisz w _instance
     #   - Zwróć _instance
+    _instance = None
+    def __new__(cls, *args, **kwargs):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls, *args, **kwargs)
+        return cls._instance
 
     # ════════════════════════════════════════════════════════
     # Inicjalizacja i metody zarządzania - GOTOWE (użyj ich)
@@ -141,17 +146,17 @@ class ConfigManager:
 
 # %% Example Usage
 # Odkomentuj gdy zaimplementujesz
-# if __name__ == "__main__":
-#     # Test singleton
-#     config1 = ConfigManager()
-#     config2 = ConfigManager()
-#
-#     print(f"Same instance: {config1 is config2}")
-#
-#     # Test functionality
-#     config1.set_config("theme", "dark")
-#     config1.set_config("language", "en")
-#
-#     print(f"Theme from config1: {config1.get_config('theme')}")
-#     print(f"Theme from config2: {config2.get_config('theme')}")
-#     print(f"All configs: {config1.get_all_configs()}")
+if __name__ == "__main__":
+    # Test singleton
+    config1 = ConfigManager()
+    config2 = ConfigManager()
+
+    print(f"Same instance: {config1 is config2}")
+
+    # Test functionality
+    config1.set_config("theme", "dark")
+    config1.set_config("language", "en")
+
+    print(f"Theme from config1: {config1.get_config('theme')}")
+    print(f"Theme from config2: {config2.get_config('theme')}")
+    print(f"All configs: {config1.get_all_configs()}")
