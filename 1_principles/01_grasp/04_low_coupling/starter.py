@@ -27,8 +27,10 @@ class Database:
 # Klasa pośrednicząca między Game a bazą danych (redukuje sprzężenie)
 # Metoda save_score(player, score) zwraca: "Saved score {score} for {player}"
 
+
 class ScoreService:
-    pass
+    def save_score(self, player, score):
+        return f'Saved score {score} for {player}'
 
 
 # TODO: Zaimplementuj Game
@@ -40,7 +42,11 @@ class ScoreService:
 # Low Coupling: Game nie zna Database, tylko ScoreService (pośrednik)
 
 class Game:
-    pass
+    def __init__(self, score_service: ScoreService):
+        self.score_service = score_service
+    def finish_game(self, player, score):
+        saved_score = self.score_service.save_score(player, score)
+        return f'Game finished. {saved_score}'
 
 
 # GRASP Low Coupling:
